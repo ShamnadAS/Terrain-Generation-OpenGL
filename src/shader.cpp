@@ -16,7 +16,8 @@ Shader &Shader::Use()
     return *this;
 }
 
-void Shader::Compile(const char* vertexSource, const char* fragmentSource, const char* geometrySource)
+void Shader::Compile(const char* vertexSource, const char* fragmentSource, const char* geometrySource, 
+const char* tcsSource, const char* tesSource)
 {
     unsigned int sVertex, sFragment, gShader;
     // vertex Shader
@@ -33,6 +34,13 @@ void Shader::Compile(const char* vertexSource, const char* fragmentSource, const
     if (geometrySource != nullptr)
     {
         gShader = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(gShader, 1, &geometrySource, NULL);
+        glCompileShader(gShader);
+        checkCompileErrors(gShader, "GEOMETRY");
+    }
+    if(tcsSource != nullptr)
+    {
+        //gShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
         glShaderSource(gShader, 1, &geometrySource, NULL);
         glCompileShader(gShader);
         checkCompileErrors(gShader, "GEOMETRY");

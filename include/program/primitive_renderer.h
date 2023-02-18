@@ -5,16 +5,16 @@
 #include <math/Vectors.h>
 #include <math/Matrices.h>
 
-#include "shader.h"
-#include "texture.h"
+#include <utility/shader.h>
+#include <utility/texture.h>
 
 class PrimitiveRenderer
 {
 public:
     PrimitiveRenderer(Shader &shader);
     ~PrimitiveRenderer();
-    virtual void DrawPrimitive(Vector3 position, Vector3 scale, Vector3 rotation);
-private:
+    virtual void DrawPrimitive(Vector3 position, float scale, Texture2D &texture);
+protected:
     //Render state
     Shader shader;
     unsigned int VAO;

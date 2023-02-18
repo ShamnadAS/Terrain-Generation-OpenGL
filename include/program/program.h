@@ -14,8 +14,11 @@ class Program
 public: 
     // programme state
     bool                    Keys[1024];
+    bool IsMouseMoving;
+    float MouseOffsetX, MouseOffsetY;
     unsigned int            Width, Height;
     ProgramState State;
+    bool WireFrame;
 
     // constructor/destructor
     Program(unsigned int width, unsigned int height);

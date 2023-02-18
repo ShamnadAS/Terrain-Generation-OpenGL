@@ -9,11 +9,16 @@
 // GLFW function declarations
 void framebuffers_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 // The Width of the screen
 const unsigned int SCREEN_WIDTH = 800;
 // The height of the screen
 const unsigned int SCREEN_HEIGHT = 600;
+
+//Mouse Input
+float lastX = 400, lastY = 300;
+bool firstMouse = true;
 
 Program TerrainGenerator(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -40,6 +45,7 @@ int main(int argc, char *argv[])
     }
 
     glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetFramebufferSizeCallback(window, framebuffers_size_callback);
 
     // OpenGL configuration
@@ -48,7 +54,9 @@ int main(int argc, char *argv[])
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // initialize game
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    // initialize program
     // ---------------
     TerrainGenerator.Init();
 
@@ -56,6 +64,12 @@ int main(int argc, char *argv[])
     // -------------------
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
+
+    //render wireframe
+    if(TerrainGenerator.WireFrame)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
 
     while (!glfwWindowShouldClose(window))
     {
@@ -69,8 +83,9 @@ int main(int argc, char *argv[])
         // manage user input
         // -----------------
         TerrainGenerator.ProcessInput(deltaTime);
+        TerrainGenerator.IsMouseMoving = false;
 
-        // update game state
+        // update program state
         // -----------------
         TerrainGenerator.Update(deltaTime);
 
@@ -103,6 +118,24 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         else if (action == GLFW_RELEASE)
             TerrainGenerator.Keys[key] = false;
     }
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    TerrainGenerator.IsMouseMoving = true;
+
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY= ypos;
+		firstMouse = false;
+	}
+
+	TerrainGenerator.MouseOffsetX = xpos - lastX;
+	TerrainGenerator.MouseOffsetY = lastY - ypos; // reversed: y ranges bottom to top
+
+	lastX = xpos;
+	lastY= ypos;
 }
 
 void framebuffers_size_callback(GLFWwindow* window, int width, int height)
