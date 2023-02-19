@@ -1,11 +1,10 @@
-#version 330 core
+#version 460 core
 out vec4 FragColor;
 
-in vec2 TexCoords;
-
-uniform sampler2D perlinNoise;
+in float Height;
 
 void main()
 {
-    FragColor = texture(perlinNoise, TexCoords);
+	float h = Height * 5.0;
+	FragColor = vec4(h, h, h, 1.0);
 }

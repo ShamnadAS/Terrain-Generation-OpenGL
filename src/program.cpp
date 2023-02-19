@@ -16,24 +16,24 @@ Program::Program(unsigned int width, unsigned int height)
 
 Program::~Program()
 {
-    
+     
 }
 
 void Program::Init()
 {   
-    ResourceManager::LoadTexture("texture/perlin_noise.png", true, "perlin");
-    ResourceManager::LoadShader("shader/shader.vert", "shader/shader.frag", nullptr, nullptr, nullptr, "shader");
+    ResourceManager::LoadTexture("texture/river2_heightmap.png", true, "perlin");
+    ResourceManager::LoadShader("shader/shader.vert", "shader/shader.frag", nullptr, "shader/shader.tcs", "shader/shader.tes", "shader");
     Shader planeShader = ResourceManager::GetShader("shader");
+    ResourceManager::GetShader("shader").Use().SetInteger("heightMap", 0);
     camera = new Camera();
     camera->Position = Vector3(0.0f, 0.25f, 0.5f);
     Renderer = new PlaneRenderer(planeShader);
     Renderer->initRenderData();
-    WireFrame = true;
 }
 
 void Program::Update(float dt)
 {
-    Matrix4 projection = Matrix4().perspective(45.0f, (float)Width/(float)Height, 100.0f, 0.1f);
+    Matrix4 projection = Matrix4().perspective(45.0f, (float)Width/(float)Height, 1000.0f, 0.1f);
     ResourceManager::GetShader("shader").Use().SetMatrix4("projection", projection);
     Matrix4 view = camera->GetViewMatrix();
     ResourceManager::GetShader("shader").Use().SetMatrix4("view", view);
@@ -60,6 +60,10 @@ void Program::ProcessInput(float dt)
     if(IsMouseMoving)
     {
         camera->ProcessMouseMovement(MouseOffsetX, MouseOffsetY);
+    }
+    if(Keys[GLFW_KEY_SPACE])
+    {
+        WireFrame = true;
     }
 }
 

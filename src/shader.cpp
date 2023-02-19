@@ -19,7 +19,7 @@ Shader &Shader::Use()
 void Shader::Compile(const char* vertexSource, const char* fragmentSource, const char* geometrySource, 
 const char* tcsSource, const char* tesSource)
 {
-    unsigned int sVertex, sFragment, gShader;
+    unsigned int sVertex, sFragment, gShader, tcShader, teShader;
     // vertex Shader
     sVertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(sVertex, 1, &vertexSource, NULL);
@@ -40,17 +40,32 @@ const char* tcsSource, const char* tesSource)
     }
     if(tcsSource != nullptr)
     {
-        //gShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
-        glShaderSource(gShader, 1, &geometrySource, NULL);
-        glCompileShader(gShader);
-        checkCompileErrors(gShader, "GEOMETRY");
+        tcShader = glCreateShader(GL_TESS_CONTROL_SHADER);
+        glShaderSource(tcShader, 1, &tcsSource, NULL);
+        glCompileShader(tcShader);
     }
-    // shader program
+    if(tesSource != nullptr)
+    {
+        teShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
+        glShaderSource(teShader, 1, &tesSource, NULL);
+        glCompileShader(teShader);
+    }
+    // shader program 
     this->ID = glCreateProgram();
     glAttachShader(this->ID, sVertex);
     glAttachShader(this->ID, sFragment);
     if (geometrySource != nullptr)
+    {
         glAttachShader(this->ID, gShader);
+    }
+    if (tcsSource != nullptr)
+    {
+        glAttachShader(this->ID, tcShader);
+    }
+    if (tesSource != nullptr)
+    {
+        glAttachShader(this->ID, teShader);
+    }
     glLinkProgram(this->ID);
     checkCompileErrors(this->ID, "PROGRAM");
     // delete the shaders as they're linked into our program now and no longer necessary
@@ -58,6 +73,10 @@ const char* tcsSource, const char* tesSource)
     glDeleteShader(sFragment);
     if (geometrySource != nullptr)
         glDeleteShader(gShader);
+    if (tcsSource != nullptr)
+        glDeleteShader(tcShader);
+    if (tesSource != nullptr)
+        glDeleteShader(teShader);
 }
 
 void Shader::SetFloat(const char *name, float value, bool useShader)

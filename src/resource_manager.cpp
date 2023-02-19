@@ -22,7 +22,7 @@ std::map<std::string, Shader>       ResourceManager::Shaders;
 Shader ResourceManager::LoadShader(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile,
 const char *tcsShaderFile, const char *tesShaderFile, std::string name)
 {
-    Shaders[name] = loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
+    Shaders[name] = loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile, tcsShaderFile, tesShaderFile);
     return Shaders[name];
 }
 
@@ -52,12 +52,15 @@ void ResourceManager::Clear()
         glDeleteTextures(1, &iter.second.ID);
 }
 
-Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile)
+Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile,
+const char *tcShaderFile, const char *teShaderFile)
 {
     // 1. retrieve the vertex/fragment source code from filePath
     std::string vertexCode;
     std::string fragmentCode;
     std::string geometryCode;
+    std::string controlCode;
+    std::string evaluationCode;
     try
     {
         // open files
@@ -82,6 +85,22 @@ Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *
             geometryShaderFile.close();
             geometryCode = gShaderStream.str();
         }
+        if (tcShaderFile != nullptr)
+        {
+            std::ifstream controlShaderFile(tcShaderFile);
+            std::stringstream tcShaderStream;
+            tcShaderStream << controlShaderFile.rdbuf();
+            controlShaderFile.close();
+            controlCode = tcShaderStream.str();
+        }
+        if (teShaderFile != nullptr)
+        {
+            std::ifstream evaluationShaderFile(teShaderFile);
+            std::stringstream teShaderStream;
+            teShaderStream << evaluationShaderFile.rdbuf();
+            evaluationShaderFile.close();
+            evaluationCode = teShaderStream.str();
+        }
     }
     catch (std::exception e)
     {
@@ -90,9 +109,12 @@ Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *
     const char *vShaderCode = vertexCode.c_str();
     const char *fShaderCode = fragmentCode.c_str();
     const char *gShaderCode = geometryCode.c_str();
+    const char *tcShaderCode = controlCode.c_str();
+    const char *teShaderCode = evaluationCode.c_str();
     // 2. now create shader object from source code
     Shader shader;
-    shader.Compile(vShaderCode, fShaderCode, gShaderFile != nullptr ? gShaderCode : nullptr);
+    shader.Compile(vShaderCode, fShaderCode, gShaderFile != nullptr ? gShaderCode : nullptr, 
+    tcShaderFile != nullptr ? tcShaderCode : nullptr, teShaderFile != nullptr ? teShaderCode : nullptr);
     return shader;
 }
 

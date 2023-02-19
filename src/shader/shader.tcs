@@ -1,0 +1,22 @@
+#version 460 core
+
+layout (vertices=4) out;
+out vec2 TexCoordinates[];
+
+in vec2 TexCoords[];
+
+int tesselationLevel = 300;
+
+void main()
+{
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    TexCoordinates[gl_InvocationID] = TexCoords[gl_InvocationID];
+
+    gl_TessLevelOuter[0] = tesselationLevel;
+    gl_TessLevelOuter[1] = tesselationLevel;
+    gl_TessLevelOuter[2] = tesselationLevel;
+    gl_TessLevelOuter[3] = tesselationLevel;
+
+    gl_TessLevelInner[0] = tesselationLevel;
+    gl_TessLevelInner[1] = tesselationLevel;
+}

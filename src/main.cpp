@@ -25,8 +25,8 @@ Program TerrainGenerator(SCREEN_WIDTH, SCREEN_HEIGHT);
 int main(int argc, char *argv[])
 {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -52,7 +52,9 @@ int main(int argc, char *argv[])
     // --------------------
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -66,13 +68,14 @@ int main(int argc, char *argv[])
     float lastFrame = 0.0f;
 
     //render wireframe
-    if(TerrainGenerator.WireFrame)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
+
 
     while (!glfwWindowShouldClose(window))
     {
+        if(TerrainGenerator.WireFrame)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
         // calculate delta time
         // --------------------
         float currentFrame = glfwGetTime();
@@ -92,7 +95,7 @@ int main(int argc, char *argv[])
         // render
         // ------
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         TerrainGenerator.Render();
 
         glfwSwapBuffers(window);
