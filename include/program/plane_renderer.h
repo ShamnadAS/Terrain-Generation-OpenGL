@@ -11,4 +11,6 @@ public:
     //constructor
     PlaneRenderer(Shader &shader);
     ~PlaneRenderer();
+
+    unsigned int Rez;
 };
